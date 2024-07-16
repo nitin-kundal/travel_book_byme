@@ -29,7 +29,7 @@ function BookingHistory() {
             <Typography variant="h4" className={classes.heading}>
                 Booking History
             </Typography>
-            {!loading ? (
+            {loading ? (
                 <div className={classes.loader}>
                     <CircularProgress />
                 </div>
