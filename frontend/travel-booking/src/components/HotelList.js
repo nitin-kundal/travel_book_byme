@@ -3,48 +3,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { fetchHotels } from '../api/api';
 import AuthContext from '../contexts/AuthContext';
-import getRandomInteger from '../utils/Utils';
+import hotelListStyles from '../styles/HotelListStyles';
+import { getRandomInteger } from '../utils/Utils';
+import localisable from '../config/localisable';
 
-const useStyles = makeStyles((theme) => ({
-    container: {
-        marginTop: theme.spacing(4),
-    },
-    hotelCard: {
-        display: 'flex',
-        marginBottom: theme.spacing(2),
-        borderRadius: 10,
-        overflow: 'hidden',
-    },
-    hotelDetails: {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: theme.spacing(2),
-    },
-    hotelImage: {
-        width: 160,
-    },
-    priceSection: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        padding: theme.spacing(2),
-        backgroundColor: '#f0f8ff',
-    },
-    paper: {
-        padding: theme.spacing(2),
-        marginBottom: theme.spacing(2),
-    },
-    noResults: {
-        marginTop: theme.spacing(4),
-        textAlign: 'center',
-    },
-}));
+const useStyles = makeStyles(hotelListStyles, { name: 'HotelList' });
 
-
-const HotelList = () => {
+function HotelList() {
     const classes = useStyles();
     const [hotels, setHotels] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -64,24 +29,22 @@ const HotelList = () => {
             const result = await fetchHotels(destination, checkInDate, checkOutDate);
             setHotels(result);
             setLoading(false);
-        }
+        };
         if (destination && checkInDate && checkOutDate) {
             getHotels();
-        }
-        else {
-            navigate('/')
+        } else {
+            navigate('/');
         }
     }, [destination, checkInDate, checkOutDate, navigate]);
 
     const handleBookNow = (hotel) => {
         if (isAuthenticated) {
-            navigate(`/hotels/book`, { state: { hotel, destination, checkInDate, checkOutDate, guests } });
-        }
-        else {
+            navigate('/hotels/book', { state: { hotel, destination, checkInDate, checkOutDate, guests } });
+        } else {
             const currentPath = location.pathname;
             const queryString = location.search;
             const from = `${currentPath}${queryString}`;
-            navigate('/login', { state: { from } })
+            navigate('/login', { state: { from } });
         }
     };
 
@@ -118,28 +81,30 @@ const HotelList = () => {
                                     style={{ marginTop: '10px' }}
                                     onClick={() => handleBookNow(hotel)}
                                 >
-                                    Book Now
+                                    {localisable.bookNow}
                                 </Button>
                             </CardContent>
                         </Card>
                     </Grid>
                 ))}
             </Grid>
-        )
-    }
+        );
+    };
 
     return (
         <Container maxWidth="md" className={classes.container}>
-            <Typography variant="h4" gutterBottom>
-                Available Hotels
-            </Typography>
+            <Grid container justifyContent='center'>
+                <Typography variant="h4" gutterBottom>
+                    Available Hotels
+                </Typography>
+            </Grid>
             {
-                loading ?
-                    <Typography variant="h6" className={classes.noResults}>Loading...</Typography>
+                loading
+                    ? <Typography variant="h6" className={classes.noResults}>Loading...</Typography>
                     : renderList()
             }
         </Container>
     );
-};
+}
 
 export default HotelList;

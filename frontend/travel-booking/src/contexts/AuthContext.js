@@ -1,12 +1,14 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom';
 import { loginUser, refreshToken } from '../api/api';
+import { COOKIE_NAMES } from '../config/Constants';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-    const [cookies, removeCookie] = useCookies(['access_token', 'refresh_token']);
+// eslint-disable-next-line react/prop-types
+export function AuthProvider({ children }) {
+    const [cookies, removeCookie] = useCookies([COOKIE_NAMES.ACCESS_TOKEN, COOKIE_NAMES.REFRESH_TOKEN]);
     const [isAuthenticated, setIsAuthenticated] = useState(!!cookies.access_token);
     const navigate = useNavigate();
 
@@ -14,14 +16,14 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(!!cookies.access_token);
     }, [cookies.access_token]);
 
-    const login = async (username, password, path='/') => {
+    const login = async (username, password, path = '/') => {
         await loginUser(username, password);
         navigate(path);
     };
 
     const logout = () => {
-        removeCookie('access_token');
-        removeCookie('refresh_token');
+        removeCookie(COOKIE_NAMES.ACCESS_TOKEN);
+        removeCookie(COOKIE_NAMES.REFRESH_TOKEN);
         navigate('/');
     };
 
@@ -34,17 +36,13 @@ export const AuthProvider = ({ children }) => {
         return () => clearInterval(interval);
     }, [cookies.refresh_token]);
 
-    const contextValue = {
-        isAuthenticated,
-        login,
-        logout
-    };
+    const contextValue = useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated, login, logout]);
 
     return (
         <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );
-};
+}
 
 export default AuthContext;

@@ -8,11 +8,29 @@ from hotel.serializers import BookingSerializer, BookingRequestSerializer
 
 
 class BookingViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing booking instances.
+    """
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new booking.
+
+        This method checks room availability for the given hotel and dates,
+        calculates the total cost, and saves the booking if rooms are available.
+
+        Parameters:
+        - request: The request object containing booking data.
+
+        Returns:
+        - Response: The created booking data with status 201 if successful.
+        - Response: An error message with status 400 if the room is not available
+          or if there are validation errors.
+        """
+
         request_serializer = BookingRequestSerializer(data=request.data)
         if request_serializer.is_valid():
             hotel = request_serializer.validated_data['hotel_id']
@@ -45,6 +63,16 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def history(self, request):
+        """
+        Retrieve the booking history for the authenticated user.
+
+        Parameters:
+        - request: The request object.
+
+        Returns:
+        - Response: A list of bookings and the total number of bookings.
+        """
+
         user = request.user
         bookings = Booking.objects.filter(user=user)
         serializer = BookingSerializer(bookings, many=True)

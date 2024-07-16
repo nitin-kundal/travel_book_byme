@@ -4,6 +4,12 @@ from rest_framework.validators import UniqueValidator
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the User model.
+
+    This serializer converts User model instances to JSON format, validates
+    the data before saving, and handles user creation with unique email.
+    """
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
@@ -18,6 +24,19 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        """
+        Create a new User instance using the validated data.
+
+        This method sets the username to be the same as the email and creates
+        a new user with the provided data.
+
+        Parameters:
+        - validated_data (dict): The validated data containing user details.
+
+        Returns:
+        - User: The created User instance.
+        """
+
         # Set the username to be the same as the email
         validated_data['username'] = validated_data['email']
         user = User.objects.create_user(

@@ -5,10 +5,10 @@ import Navbar from './Navbar';
 
 const useStyles = makeStyles(() => ({
     root: { height: '100vh' },
-    main: { flexGrow: 1 }
-}))
+    main: { flexGrow: 1 },
+}));
 
-const LandingPage = () => {
+function LandingPage() {
     const classes = useStyles();
 
     return (
@@ -19,6 +19,6 @@ const LandingPage = () => {
             </main>
         </Grid>
     );
-};
+}
 
 export default LandingPage;

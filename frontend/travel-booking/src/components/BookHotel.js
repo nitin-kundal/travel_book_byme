@@ -2,53 +2,17 @@ import { Button, Container, Divider, Grid, makeStyles, Paper, Snackbar, Typograp
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { bookHotel } from '../api/api';
+import bookHotelStyles from '../styles/BookHotelStyles';
+import localisable from '../config/localisable';
+import { formatDateLocale } from '../utils/Utils';
 
-const useStyles = makeStyles((theme) => ({
-    container: {
-        marginTop: theme.spacing(8),
-    },
-    paper: {
-        padding: theme.spacing(4),
-        marginTop: theme.spacing(4),
-    },
-    header: {
-        marginBottom: theme.spacing(3),
-        fontWeight: 'bold',
-    },
-    details: {
-        marginBottom: theme.spacing(2),
-    },
-    divider: {
-        margin: theme.spacing(2, 0),
-    },
-    totalAmount: {
-        fontWeight: 'bold',
-        color: theme.palette.primary.main,
-    },
-    button: {
-        marginTop: theme.spacing(3),
-    },
-    sectionTitle: {
-        marginTop: theme.spacing(3),
-        marginBottom: theme.spacing(1),
-        fontWeight: 'bold',
-    },
-    subtext: {
-        color: theme.palette.text.secondary,
-    },
-    priceDetails: {
-        marginTop: theme.spacing(2),
-    },
-    price: { lineHeight: 2 },
-    fontWeightBold: { fontWeight: 'bold' },
-    pricePerNight: { marginTop: theme.spacing(1) }
-}));
+const useStyles = makeStyles(bookHotelStyles, { name: 'BookHotel' });
 
-const HotelDetails = () => {
+function HotelDetails() {
     const classes = useStyles();
     const navigate = useNavigate();
     const { state } = useLocation();
-    const { hotel, checkInDate, checkOutDate } =  state || {}
+    const { hotel, checkInDate, checkOutDate } = state || {};
     const [error, setError] = useState('');
     const [isBooked, setIsBooked] = useState(false);
 
@@ -60,14 +24,14 @@ const HotelDetails = () => {
                 setError('');
                 setIsBooked(true);
             } else {
-                throw new Error('Booking failed');
+                throw new Error(localisable.bookingFailed);
             }
         } catch (err) {
-            setError('Failed to create booking. Please try again.');
+            setError(localisable.bookingFailed);
         }
     };
 
-    const calculateTotalAmount = (pricePerNight, checkInDate, checkOutDate) => {
+    const calculateTotalAmount = (pricePerNight) => {
         const checkIn = new Date(checkInDate);
         const checkOut = new Date(checkOutDate);
         const diffTime = Math.abs(checkOut - checkIn);
@@ -79,46 +43,36 @@ const HotelDetails = () => {
         <Container maxWidth="sm" className={classes.container}>
             <Paper className={classes.paper} elevation={3}>
                 <Typography variant="h5" className={classes.header}>
-                    Your Booking Details
+                    {localisable.yourBookingDetails}
                 </Typography>
                 <Divider className={classes.divider} />
                 <Grid container spacing={4}>
                     <Grid item xs={6}>
                         <Typography variant="h6" className={classes.sectionTitle}>
-                            Check-in
+                            {localisable.checkIn}
                         </Typography>
                         <Typography variant="body1">
-                            {new Date(checkInDate).toLocaleDateString('en-GB', {
-                                weekday: 'short',
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric'
-                            })}
+                            {formatDateLocale(checkInDate)}
                         </Typography>
                         <Typography variant="body2" className={classes.subtext}>
-                            From 12:00 PM
+                            {localisable.checkInTime}
                         </Typography>
                     </Grid>
-                    <Grid container item xs={6} direction='column'>
+                    <Grid container item xs={6} direction="column" alignItems='flex-end'>
                         <Typography variant="h6" className={classes.sectionTitle}>
-                            Check-out
+                            {localisable.checkOut}
                         </Typography>
                         <Typography variant="body1">
-                            {new Date(checkOutDate).toLocaleDateString('en-GB', {
-                                weekday: 'short',
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric'
-                            })}
+                            {formatDateLocale(checkOutDate)}
                         </Typography>
                         <Typography variant="body2" className={classes.subtext}>
-                            Until 11:00 AM
+                            {localisable.checkOutTime}
                         </Typography>
                     </Grid>
                 </Grid>
-                <Grid container justifyContent='space-between' alignItems='center' className={classes.pricePerNight}>
+                <Grid container justifyContent="space-between" alignItems="center" className={classes.pricePerNight}>
                     <Typography variant="body2">
-                        Total length of stay
+                        {localisable.totalLengthOfStay}
                     </Typography>
                     <Typography variant="body2">
                         {Math.ceil((new Date(checkOutDate) - new Date(checkInDate)) / (1000 * 60 * 60 * 24))} night(s)
@@ -126,19 +80,19 @@ const HotelDetails = () => {
                 </Grid>
                 <Divider className={classes.divider} />
                 <Typography variant="body2" className={classes.fontWeightBold}>
-                    Your Price Summary
+                    {localisable.yourPriceSummary}
                 </Typography>
                 <Grid container className={classes.priceDetails}>
-                    <Grid container justifyContent='space-between' alignContent='center'>
+                    <Grid container justifyContent="space-between" alignContent="center">
                         <Typography variant="body2">Original price per night</Typography>
                         <Typography variant="body2">
-                            ₹ {Number(hotel.price_per_night).toFixed(2)}
+                            {localisable.rupeeSymbol} {Number(hotel.price_per_night).toFixed(2)}
                         </Typography>
                     </Grid>
-                    <Grid container justifyContent='space-between' alignContent='center'>
+                    <Grid container justifyContent="space-between" alignContent="center">
                         <Typography variant="body2" className={classes.price}>Total amount</Typography>
                         <Typography variant="body2" className={classes.price}>
-                            ₹ {calculateTotalAmount(hotel.price_per_night, checkInDate, checkOutDate)}
+                            {localisable.rupeeSymbol} {calculateTotalAmount(hotel.price_per_night)}
                         </Typography>
                     </Grid>
                 </Grid>
@@ -146,7 +100,7 @@ const HotelDetails = () => {
                 {isBooked ? (
                     <>
                         <Typography variant="h6" className={classes.successMessage}>
-                            Booking successful! Your booking details have been saved.
+                            {localisable.bookingSuccessful}
                         </Typography>
                         <Button
                             variant="contained"
@@ -154,7 +108,7 @@ const HotelDetails = () => {
                             className={classes.button}
                             onClick={() => navigate('/')}
                         >
-                            Return to Home
+                            {localisable.returnToHome}
                         </Button>
                     </>
                 ) : (
@@ -164,7 +118,7 @@ const HotelDetails = () => {
                         className={classes.button}
                         onClick={handleCheckout}
                     >
-                        Checkout
+                        {localisable.checkout}
                     </Button>
                 )}
             </Paper>
@@ -180,6 +134,6 @@ const HotelDetails = () => {
             )}
         </Container>
     );
-};
+}
 
 export default HotelDetails;

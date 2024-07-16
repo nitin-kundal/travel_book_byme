@@ -1,46 +1,45 @@
 import axios from 'axios';
 import { Cookies } from 'react-cookie';
+import { COOKIE_NAMES } from '../config/Constants';
 
 const cookies = new Cookies();
 
 const api = axios.create({
     baseURL: 'http://localhost:8000/api',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    withCredentials: true
+    headers: { 'Content-Type': 'application/json' },
+    withCredentials: true,
 });
 
 const setAuthHeaders = () => {
-    const token = cookies.get('access_token');
+    const token = cookies.get(COOKIE_NAMES.ACCESS_TOKEN);
     if (token) {
-        api.defaults.headers['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.Authorization = `Bearer ${token}`;
     }
 };
 
 export const loginUser = async (username, password) => {
     const response = await api.post('/token/', { username, password });
-    // cookies.set('access_token', response.data.access, { path: '/', secure: false, httpOnly: true, sameSite: 'Lax' });
-    cookies.set('access_token', response.data.access);
-    cookies.set('refresh_token', response.data.refresh);
+    // cookies.set(COOKIE_NAMES.ACCESS_TOKEN, response.data.access, { path: '/', secure: false, httpOnly: true, sameSite: 'Lax' });
+    cookies.set(COOKIE_NAMES.ACCESS_TOKEN, response.data.access);
+    cookies.set(COOKIE_NAMES.REFRESH_TOKEN, response.data.refresh);
     setAuthHeaders();
     return response.data;
 };
 
 export const createUser = async (formData) => {
-    const response = await api.post('/users/', formData)
-    cookies.set('access_token', response.data.access);
-    cookies.set('refresh_token', response.data.refresh);
+    const response = await api.post('/users/', formData);
+    cookies.set(COOKIE_NAMES.ACCESS_TOKEN, response.data.access);
+    cookies.set(COOKIE_NAMES.REFRESH_TOKEN, response.data.refresh);
     setAuthHeaders();
-    return response.data
-}
+    return response.data;
+};
 
 export const refreshToken = async () => {
-    const refresh_token = cookies.get('refresh_token');
-    if (refresh_token) {
-        const response = await api.post('/token/refresh/', { refresh: refresh_token });
+    const currentRefreshToken = cookies.get(COOKIE_NAMES.REFRESH_TOKEN);
+    if (currentRefreshToken) {
+        const response = await api.post('/token/refresh/', { refresh: currentRefreshToken });
         if (response?.response?.status === 200) {
-            cookies.set('access_token', response.data.access);
+            cookies.set(COOKIE_NAMES.ACCESS_TOKEN, response.data.access);
             setAuthHeaders();
         }
     }
@@ -48,7 +47,8 @@ export const refreshToken = async () => {
 
 export const fetchHotels = async (location, checkInDate, checkOutDate) => {
     setAuthHeaders();
-    const response = await api.get(`/hotels/search/?location=${location}&check_in_date=${checkInDate}&check_out_date=${checkOutDate}`);
+    const queryParams = `location=${location}&check_in_date=${checkInDate}&check_out_date=${checkOutDate}`;
+    const response = await api.get(`/hotels/search/?${queryParams}`);
     return response.data;
 };
 
@@ -60,17 +60,19 @@ export const fetchBookingHistory = async () => {
 
 export const bookHotel = async (hotelId, checkInDate, checkOutDate) => {
     setAuthHeaders();
-    const response = await api.post('/bookings/', { hotel_id: hotelId, check_in_date: checkInDate, check_out_date: checkOutDate });
+    const response = await api.post('/bookings/', {
+        hotel_id: hotelId,
+        check_in_date: checkInDate,
+        check_out_date: checkOutDate,
+    });
     return response.data;
 };
 
-api.interceptors.response.use((response) => {
-    return response;
-}, (error) => {
+api.interceptors.response.use((response) => response, (error) => {
     if (error.response && error.response.status === 401) {
         // Clear the access token cookie
-        cookies.remove('access_token');
-        cookies.remove('refresh_token');
+        cookies.remove(COOKIE_NAMES.ACCESS_TOKEN);
+        cookies.remove(COOKIE_NAMES.REFRESH_TOKEN);
 
         // Store the current app route
         const currentRoute = window.location.pathname;

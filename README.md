@@ -8,8 +8,6 @@
 3. [Project Structure](#project-structure)
 4. [Setup Instructions](#setup-instructions)
 5. [Usage Guidelines](#usage-guidelines)
-6. [Contributing](#contributing)
-7. [License](#license)
 
 ## Introduction
 
@@ -21,7 +19,6 @@ A hotel booking application built with React and Django. This application allows
 - Hotel search and booking
 - View booking history
 - Responsive design
-- Centralized error handling with Snackbar notifications
 - Protected routes for authenticated users
 
 ## Project Structure
@@ -119,6 +116,10 @@ travel_booking/
     ```sh
     python manage.py runserver
     ```
+    
+8. **Add hotels via Django admin:**
+
+    Navigate to `http://localhost:8000/admin` and log in with the superuser credentials you created. Use the admin interface to add hotels to the database.
 
 ### Frontend Setup
 

@@ -3,15 +3,17 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { createUser } from '../api/api';
+import localisable from '../config/localisable';
 
-const SignUpForm = ({ classes }) => {
+function SignUpForm({ classes }) {
     const [formData, setFormData] = useState({
         password: '',
         email: '',
         first_name: '',
-        last_name: ''
+        last_name: '',
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
@@ -19,7 +21,7 @@ const SignUpForm = ({ classes }) => {
     const handleChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
         });
     };
 
@@ -39,18 +41,18 @@ const SignUpForm = ({ classes }) => {
 
     return (
         <>
-            {success && <Typography color="primary">User created successfully!</Typography>}
-            {error && <Typography color="error">Something went wrong!</Typography>}
+            {success && <Typography color="primary">{localisable.userCreatedSuccessfully}</Typography>}
+            {error && <Typography color="error">{localisable.somethingWentWrong}</Typography>}
             <form className={classes.form} onSubmit={handleSubmit}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <TextField
                             autoComplete="fname"
-                            name="firstName"
+                            name="first_name"
                             variant="outlined"
                             required
                             fullWidth
-                            id="firstName"
+                            id="first_name"
                             label="First Name"
                             autoFocus
                             onChange={handleChange}
@@ -61,9 +63,9 @@ const SignUpForm = ({ classes }) => {
                             variant="outlined"
                             required
                             fullWidth
-                            id="lastName"
+                            id="last_name"
                             label="Last Name"
-                            name="lastName"
+                            name="last_name"
                             autoComplete="lname"
                             onChange={handleChange}
                         />
@@ -100,19 +102,22 @@ const SignUpForm = ({ classes }) => {
                     variant="contained"
                     color="primary"
                     className={classes.submit}
+                    disabled={!Object.values(formData).every(Boolean)}
                 >
-                    Sign Up
+                    {localisable.signUp}
                 </Button>
                 <Grid container justifyContent="flex-end">
                     <Grid item>
                         <Link href="/login" variant="body2">
-                            Already have an account? Sign in
+                            {localisable.alreadyHaveAccount}
                         </Link>
                     </Grid>
                 </Grid>
             </form>
         </>
-    )
-};
+    );
+}
+
+SignUpForm.propTypes = { classes: PropTypes.object };
 
 export default SignUpForm;

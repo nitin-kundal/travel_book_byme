@@ -6,13 +6,16 @@ import Link from '@material-ui/core/Link';
 import TextField from '@material-ui/core/TextField';
 import React, { useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import AuthContext from '../contexts/AuthContext';
+import localisable from '../config/localisable';
 
-const SignInForm = ({ classes }) => {
+function SignInForm({ classes }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { login } = useContext(AuthContext) || {};
     const location = useLocation();
+
     // Parse the "from" query parameter from the URL
     const queryParams = new URLSearchParams(location.search);
     const from = queryParams.get('from') || '/';
@@ -60,23 +63,19 @@ const SignInForm = ({ classes }) => {
                 variant="contained"
                 color="primary"
                 className={classes.submit}
+                disabled={!(username && password)}
             >
-                Sign In
+                {localisable.signIn}
             </Button>
-            <Grid container>
-                <Grid item xs>
-                    <Link href="#" variant="body2">
-                        Forgot password?
-                    </Link>
-                </Grid>
-                <Grid item>
+            <Grid container justifyContent='flex-end'>
                     <Link href="/signup" variant="body2">
-                        {"Don't have an account? Sign Up"}
+                        {localisable.doNotHaveAccount}
                     </Link>
-                </Grid>
             </Grid>
         </form>
-    )
-};
+    );
+}
+
+SignInForm.propTypes = { classes: PropTypes.object };
 
 export default SignInForm;

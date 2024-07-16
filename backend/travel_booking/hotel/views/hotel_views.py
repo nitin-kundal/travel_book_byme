@@ -10,6 +10,9 @@ from hotel.serializers import HotelSerializer
 
 
 class HotelViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing hotel instances.
+    """
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
     filterset_class = HotelFilter
@@ -20,6 +23,18 @@ class HotelViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def search(self, request):
+        """
+        Custom action to search for available hotels based on location,
+        check-in date, and check-out date.
+
+        Parameters:
+        - location (str): The location of the hotel.
+        - check_in_date (str): The check-in date for the booking (YYYY-MM-DD).
+        - check_out_date (str): The check-out date for the booking (YYYY-MM-DD).
+
+        Returns:
+        - Response: A list of available hotels that match the criteria.
+        """
         location = request.query_params.get('location', None)
         check_in_date = request.query_params.get('check_in_date', None)
         check_out_date = request.query_params.get('check_out_date', None)

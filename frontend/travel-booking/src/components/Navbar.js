@@ -3,49 +3,19 @@ import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '../assets/logo.png';
 import AuthContext from '../contexts/AuthContext';
+import navbarStyles from '../styles/NavbarStyles';
+import localisable from '../config/localisable';
 
-const useStyles = makeStyles((theme) => ({
-    navbar: {
-        backgroundColor: '#fff',
-        color: '#000',
-        boxShadow: 'none',
-        borderBottom: '1px solid #e0e0e0',
-        padding: theme.spacing(1, 2),
-    },
-    toolbar: {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    logo: {
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        textDecoration: 'none',
-        color: 'inherit',
-    },
-    navButtons: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    navButton: {
-        marginLeft: theme.spacing(2),
-    },
-    logoImage: {
-        height: 40,
-        marginRight: theme.spacing(1),
-    },
-}));
+const useStyles = makeStyles(navbarStyles, { name: 'Navbar' });
 
-const Navbar = () => {
+function Navbar() {
     const classes = useStyles();
     const navigate = useNavigate();
     const { logout, isAuthenticated } = useContext(AuthContext);
 
     const onClickLogin = () => {
-        navigate('/login', { replace: true })
-    }
+        navigate('/login', { replace: true });
+    };
 
     return (
         <AppBar position="static" className={classes.navbar}>
@@ -53,19 +23,47 @@ const Navbar = () => {
                 <a href="/" className={classes.logo}>
                     <img src={Logo} alt="Logo" className={classes.logoImage} />
                     <Typography variant="h6" noWrap>
-                        Otelle
+                        {localisable.otelle}
                     </Typography>
                 </a>
                 <div className={classes.navButtons}>
                     <Button color="inherit" className={classes.navButton} onClick={() => navigate('/')}>Home</Button>
-                    {isAuthenticated && <Button color="inherit" className={classes.navButton} onClick={() => navigate('/bookings')}>Booking History</Button>}
-                    {isAuthenticated ? <Button color="inherit" className={classes.navButton} onClick={() => logout()}>Logout</Button>
-                        : <Button color="inherit" className={classes.navButton} onClick={onClickLogin}>Login</Button>}
+                    {
+                        isAuthenticated && (
+                            <Button
+                                color="inherit"
+                                className={classes.navButton}
+                                onClick={() => navigate('/bookings')}
+                            >
+                                {localisable.bookingHistory}
+                            </Button>
+                        )
+                    }
+                    {
+                        isAuthenticated
+                            ? (
+                                <Button
+                                    color="inherit"
+                                    className={classes.navButton}
+                                    onClick={() => logout()}
+                                >
+                                    {localisable.logout}
+                                </Button>
+                            )
+                            : (
+                                <Button
+                                    color="inherit"
+                                    className={classes.navButton}
+                                    onClick={onClickLogin}
+                                >
+                                    {localisable.login}
+                                </Button>
+                            )
+                    }
                 </div>
             </Toolbar>
         </AppBar>
     );
-};
+}
 
 export default Navbar;
-
